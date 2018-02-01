@@ -1,0 +1,29 @@
+#
+# Copyright IBM Corp All Rights Reserved
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+version: '2'
+
+networks:
+  basic:
+
+services:
+  ca.psl.com:
+    image: hyperledger/fabric-ca:x86_64-1.0.0
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.psl.com
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca/ca.psl.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/ca/44213f2dab89afce63d6eaab1ce33e066ddc24cf7fa5c5b2fc84fc0f8c74ab94_sk
+       
+
+    ports:
+      - "7054:7054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/ordererOrganizations/psl.com:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.psl.com
+    networks:
+      - basic
+
