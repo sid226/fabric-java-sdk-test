@@ -41,7 +41,7 @@ public class test {
             System.out.println("File storage location"+System.getProperty("java.io.tmpdir")+"/HFCSampletest.properties");
 
             if (sampleStoreFile.exists()){
-              //  sampleStoreFile.delete();
+                sampleStoreFile.delete();
             }
 
            final SampleStore sampleStore = new SampleStore(sampleStoreFile);
@@ -63,7 +63,9 @@ public class test {
             System.out.println("**************************ADMIN TEST*****************************");
             //Get Admin from file storage
             SampleUser admin = sampleStore.getMember("admin", "Org1MSP");
+
             System.out.println("ADMIN ENROLLED?? = "+admin.isEnrolled());
+
             //Check If Admin Enrolled
             if (!admin.isEnrolled()) {  //Preregistered admin only needs to be enrolled with Fabric caClient.
                 //Enroll Admin
@@ -75,34 +77,38 @@ public class test {
 
             System.out.println("**************************USER TEST *****************************");
             //Get User from file storage
-            SampleUser user = sampleStore.getMember("user3", "org1");
+            SampleUser user = sampleStore.getMember("user6", "org1");
 
             System.out.println("user.isRegistered()"+user.isRegistered());
 
             //  Check If User already Registered
            /* if (!user.isRegistered()) {  // users need to be registered AND enrolled
                 //Register User with CA
-                RegistrationRequest rr = new RegistrationRequest("user3", "org1.department1");
-                System.out.println("Secret is "+ca.register(rr, admin));
+                RegistrationRequest rr = new RegistrationRequest("user6", "org1.department1");
+                String EnrollmentSecret=ca.register(rr, admin);
+                System.out.println("Secret is "+EnrollmentSecret);
 
-                //user.setEnrollmentSecret(ca.register(rr, admin));
+                user.setEnrollmentSecret(EnrollmentSecret);
+                System.out.println("user.isRegistered()"+user.isRegistered());
             }*/
+
             System.out.println("user.isEnrolled()"+user.isEnrolled());
             //  Check If User already Enrolled
-          /*  if (!user.isEnrolled()) {
+           /* if (!user.isEnrolled()) {
                 //Enroll user
                 System.out.println("NOT enrolled");
-                Enrollment enrollment = ca.enroll("user3", "WZrJWtUlksRC");
+                Enrollment enrollment = ca.enroll("user6", user.getEnrollmentSecret());
                 System.out.println("enroll is "+enrollment.toString());
                 user.setEnrollment(enrollment);
                 user.setMspId("Org1MSP");
+                System.out.println("user.isEnrolled()"+user.isEnrolled());
             }*/
 
             System.out.println(("Certificate "+user.getEnrollment().getCert()));
-            System.out.println(("Private Key ALGORITHM: "+user.getEnrollment().getKey().getAlgorithm()));
-            System.out.println(("Private Key FORMAT:"+user.getEnrollment().getKey().getFormat()));
-            System.out.println(("Private Key "+user.getEnrollment().getKey().getEncoded().toString()));
-            System.out.println("**************************USER TEST DONE*****************************");
+//            System.out.println(("Private Key ALGORITHM: "+user.getEnrollment().getKey().getAlgorithm()));
+//            System.out.println(("Private Key FORMAT:"+user.getEnrollment().getKey().getFormat()));
+//            System.out.println(("Private Key "+user.getEnrollment().getKey().getEncoded().toString()));
+//            System.out.println("**************************USER TEST DONE*****************************");
 
         }  catch (Exception e) {
             // TODO Auto-generated catch block

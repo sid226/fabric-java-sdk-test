@@ -36,7 +36,7 @@ public class SampleUser implements User, Serializable {
     private transient SampleStore keyValStore;
     private String keyValStoreName;
 
-    SampleUser(String name, String org, SampleStore fs) {
+    SampleUser(String name, String org, SampleStore fs)  {
         this.name = name;
 
         this.keyValStore = fs;
@@ -125,13 +125,35 @@ public class SampleUser implements User, Serializable {
      * Save the state of this user to the key value store.
      */
     void saveState() {
-        this.getEnrollment().getKey();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(this);
             oos.flush();
-            keyValStore.setValue(keyValStoreName, Hex.toHexString(bos.toByteArray()));
+            //Encrypt object data
+            AESenc aes=new AESenc();
+
+            String hexString =Hex.toHexString(bos.toByteArray());
+           // System.out.println("BEFORE ENCRYPTION"+hexString);
+            String encryptedString= null;
+            try {
+                encryptedString = aes.encrypt(hexString);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+          //  System.out.println("AFTER ENCRYPTION"+encryptedString);
+/*//TestDecryption
+            String DecryptedString= null;
+            try {
+                DecryptedString = aes.decrypt(encryptedString);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            System.out.println("AFTER DECRYPTION"+DecryptedString);
+*/
+            keyValStore.setValue(keyValStoreName,encryptedString );
             bos.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -141,12 +163,22 @@ public class SampleUser implements User, Serializable {
     /**
      * Restore the state of this user from the key value store (if found).  If not found, do nothing.
      */
-    SampleUser restoreState() {
+    SampleUser restoreState()  {
         String memberStr = keyValStore.getValue(keyValStoreName);
         if (null != memberStr) {
             // The user was found in the key value store, so restore the
             // state.
-            byte[] serialized = Hex.decode(memberStr);
+
+           // System.out.println("BEFORE DECRYPTION"+memberStr);
+            AESenc aes=new AESenc();
+            String DecryptedString= null;
+            try {
+                DecryptedString = aes.decrypt(memberStr);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            byte[] serialized = Hex.decode(DecryptedString);
             ByteArrayInputStream bis = new ByteArrayInputStream(serialized);
             try {
                 ObjectInputStream ois = new ObjectInputStream(bis);
